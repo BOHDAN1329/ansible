@@ -1,4 +1,2 @@
-[my_serve]
-remote_server ansible_host=13.86.213.74 ansible_user=ubuntu  ansible_ssh_private_key_file=/home/bohdanp/Desktop/ansible/ubuntu_key.pem
 [my_servers]
-remote_server ansible_host=16.171.54.179 ansible_user=ubuntu  ansible_ssh_private_key_file=/home/bohdanp/Desktop/python-app.pem
+remote_server ansible_host=16.171.54.179 ansible_user=ubuntu
