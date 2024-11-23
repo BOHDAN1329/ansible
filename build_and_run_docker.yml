@@ -1,0 +1,39 @@
+---
+- name: Build and run Docker container from GitHub repository
+  hosts: my_servers
+  become: yes  # Use if you need elevated privileges (e.g., for Docker)
+  tasks:
+
+    - name: Clone the Git repository
+      git:
+        repo: 'https://github.com/BOHDAN1329/python-simple-website.git'  # Replace with your GitHub repository URL
+        dest: '/home/azureuser'  # Replace with the desired local directory
+        clone: yes
+        update: yes
+
+    - name: Change to the project directory
+      command: "cd /home/azureuser/python-simple-project"  # Replace with the actual directory
+
+    - name: Build Docker image from Dockerfile
+      docker_image:
+        path: /home/azureuser/python-simple-project  # Path to the directory containing the Dockerfile
+        name: Python  # Name for the Docker image
+        tag: latest
+
+    - name: Run Docker container
+      docker_container:
+        name:   # Name for the Docker container
+        image: Python:latest  # Image to run
+        state: started  # Ensure the container is started
+        restart_policy: always  # Ensure the container restarts automatically if it stops
+        detach: yes  # Run container in detached mode
+        ports:
+          - "5000:4949"  # Expose ports (adjust as necessary)
+
+    - name: Clean up old Docker containers (optional)
+      docker_container:
+        name: Python
+        state: absent  # Stop and remove the container if it exists
+        force_kill: yes
+        remove_volumes: yes
+        ignore_errors: yes  # Continue even if the container does not exist

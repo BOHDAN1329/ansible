@@ -1,0 +1,41 @@
+---
+- name: Git operation on repository
+  hosts: my_servers
+  become: yes
+  tasks:
+    - name: Download repository
+      git:
+        repo: https://github.com/BOHDAN1329/python-simple-website.git
+        dest: /home/ubuntu/app
+        version: main  # Optional: specify branch, tag, or commit
+        clone: yes      # Whether to clone the repository (default is yes)
+        update: yes
+
+    - name: Check if Dockerfile exists
+      command: ls -l /home/ubuntu/app/Dockerfile
+      register: dockerfile_check
+      failed_when: dockerfile_check.rc != 0
+      ignore_errors: yes
+
+    - name: Display Dockerfile check result
+      debug:
+        var: dockerfile_check.stdout
+
+    - name: Build Docker image manually
+      command: docker build -t python-app:latest /home/ubuntu/app
+      register: docker_build_output
+      failed_when: docker_build_output.rc != 0
+      ignore_errors: yes
+
+    - name: Show Docker build output
+      debug:
+        var: docker_build_output.stdout
+
+    - name: Run Docker container
+      community.docker.docker_container:
+        name: app
+        image: python-app:latest
+        state: started
+        restart_policy: always
+        ports:
+          - "5000:4949"
